@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Centos7.6下使用StrongSwan架设IKEv2 VPN - Even - A super concise theme for Hugo</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Wikipedia" /><meta name="description" content="Centos7.6下使用StrongSwan架设IKEv2 VPN 介绍使用StrongSwan 5.7.2在服务器上架设支持IKEv2的VPN 介绍使" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.71.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/strongswan%E6%90%AD%E5%BB%BAvpn/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.8c3cbcb0324c2bb4875ceccba4007cbad4b4ac8377f33af9953c3e7684534a50.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Centos7.6下使用StrongSwan架设IKEv2 VPN" />
+<meta property="og:description" content="Centos7.6下使用StrongSwan架设IKEv2 VPN 介绍使用StrongSwan 5.7.2在服务器上架设支持IKEv2的VPN 介绍使" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/strongswan%E6%90%AD%E5%BB%BAvpn/" />
+<meta property="article:published_time" content="2020-05-21T01:37:56+08:00" />
+<meta property="article:modified_time" content="2020-05-21T01:37:56+08:00" />
+<meta itemprop="name" content="Centos7.6下使用StrongSwan架设IKEv2 VPN">
+<meta itemprop="description" content="Centos7.6下使用StrongSwan架设IKEv2 VPN 介绍使用StrongSwan 5.7.2在服务器上架设支持IKEv2的VPN 介绍使">
+<meta itemprop="datePublished" content="2020-05-21T01:37:56&#43;08:00" />
+<meta itemprop="dateModified" content="2020-05-21T01:37:56&#43;08:00" />
+<meta itemprop="wordCount" content="5332">
+
+
+
+<meta itemprop="keywords" content="preview,linux,tag-1," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Centos7.6下使用StrongSwan架设IKEv2 VPN"/>
+<meta name="twitter:description" content="Centos7.6下使用StrongSwan架设IKEv2 VPN 介绍使用StrongSwan 5.7.2在服务器上架设支持IKEv2的VPN 介绍使"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Even</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a><a href="/post/openvpn%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85/">
+        <li class="mobile-menu-item">Openvpn-install</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Even</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/openvpn%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85/">Openvpn-install</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Centos7.6下使用StrongSwan架设IKEv2 VPN</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-21 </span>
+        <div class="post-category">
+            <a href="/categories/centos/"> centos </a>
+            </div>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> times read </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#centos76下使用strongswan架设ikev2-vpn">Centos7.6下使用StrongSwan架设IKEv2 VPN</a></li>
+        <li><a href="#一-安装">一. 安装</a></li>
+        <li><a href="#二生成服务器证书">二、生成服务器证书</a></li>
+        <li><a href="#三生成客户端证书">三、生成客户端证书</a></li>
+        <li><a href="#四安装证书">四、安装证书</a></li>
+        <li><a href="#五配置strongswan">五、配置StrongSwan</a></li>
+        <li><a href="#六启动检证strongswan">六、启动检证strongswan</a></li>
+        <li><a href="#七防火墙配置">七、防火墙配置</a></li>
+        <li><a href="#八开启内核转发">八、开启内核转发</a></li>
+        <li><a href="#九vpn-pptpl2tpikev2openvpnssh协议的区别">九、VPN PPTP/L2TP/IKEv2/OpenVPN/SSH协议的区别</a></li>
+        <li><a href="#十参考网址">十、参考网址</a></li>
+        <li><a href="#十一查看strongswan状态">十一、查看strongswan状态：</a></li>
+        <li><a href="#十二android手机证书配置">十二、Android手机证书配置：</a></li>
+        <li><a href="#十三win7win10-证书配置">十三、win7/win10 证书配置：</a></li>
+        <li><a href="#十四苹果ios-配置vpn连接">十四、苹果ios 配置vpn连接：</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h3 id="centos76下使用strongswan架设ikev2-vpn">Centos7.6下使用StrongSwan架设IKEv2 VPN</h3>
+<ul>
+<li>介绍使用StrongSwan 5.7.2在服务器上架设支持IKEv2的VPN</li>
+<li>介绍使用Windows、Android客户端连接使用VPN</li>
+<li>官网：https://www.strongswan.org/</li>
+</ul>
+<h3 id="一-安装">一. 安装</h3>
+<h4 id="11-安装epel扩展源">1.1 安装EPEL扩展源</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># yum -y install epel-release redhat-release</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="12-安装strongswan">1.2 安装StrongSwan</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># yum -y install strongswan xl2tpd ppp</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="13-查看版本">1.3 查看版本</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan version</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="14-官网安装参考">1.4 官网安装参考</h4>
+<p><a href="https://wiki.strongswan.org/projects/strongswan/wiki/InstallationDocumentation">https://wiki.strongswan.org/projects/strongswan/wiki/InstallationDocumentation</a></p>
+<h3 id="二生成服务器证书">二、生成服务器证书</h3>
+<h4 id="21-生成ca私钥">2.1 生成CA私钥</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan pki --gen --outform pem &gt; ca.key.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="22-基于这个私钥自己签一个-ca-证书">2.2 基于这个私钥自己签一个 CA 证书</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan  pki --self --in ca.key.pem --dn &#34;C=CN, O=VPN, CN=StrongSwan CA&#34; --ca --outform pem &gt; ca.cert.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="23-参数解释">2.3 参数解释</h4>
+<ul>
+<li>C 表示国家名</li>
+<li>O 表示组织名</li>
+<li>CN 为通用名</li>
+</ul>
+<h4 id="23-生成服务器证书所需的私钥">2.3 生成服务器证书所需的私钥</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan pki --gen --outform pem &gt; server.key.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="24-用ca证书签发服务器证书">2.4 用CA证书签发服务器证书</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan pki --pub --in server.key.pem | strongswan pki --issue --cacert ca.cert.pem --cakey ca.key.pem --dn &#34;C=CN, O=VPN, CN=服务器公网地址或域名&#34;  --san=&#34;服务器公网地址或域名&#34; --flag serverAuth --flag ikeIntermediate  --outform pem &gt; server.cert.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="25-服务器证书签发注意事项">2.5 服务器证书签发注意事项</h4>
+<ul>
+<li>这里C、O的值要跟2.2的一致</li>
+<li>CN值及&ndash;san值填写服务器公网地址或域名</li>
+</ul>
+<h3 id="三生成客户端证书">三、生成客户端证书</h3>
+<h4 id="31-生成客户端证书所需的私钥">3.1 生成客户端证书所需的私钥</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan pki --gen --outform pem &gt; client.key.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="32-用ca证书签发客户端证书">3.2 用CA证书签发客户端证书</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># strongswan pki --pub --in client.key.pem | strongswan pki --issue --cacert ca.cert.pem --cakey ca.key.pem --dn &#34;C=CN, O=VPN, CN=VPN Client&#34; --outform pem &gt; client.cert.pem</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="32-客户端证书签发注意事项">3.2 客户端证书签发注意事项</h4>
+<ul>
+<li>这里C、O的值要跟2.2的一致</li>
+</ul>
+<h4 id="33-生成-pkcs12-证书用来导入电脑或手机">3.3 生成 pkcs12 证书用来导入电脑或手机</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># openssl pkcs12 -export -inkey client.key.pem -in client.cert.pem -name &#34;client&#34; -certfile ca.cert.pem -caname &#34;VPN Client&#34; -out client.cert.p12</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="四安装证书">四、安装证书</h3>
+<h4 id="41-拷贝证书">4.1 拷贝证书</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># cp -r ca.cert.pem /etc/strongswan/ipsec.d/cacerts/</span>
+<span class="c1"># cp -r server.cert.pem /etc/strongswan/ipsec.d/certs/</span>
+<span class="c1"># cp -r server.key.pem /etc/strongswan/ipsec.d/private/</span>
+<span class="c1"># cp -r client.cert.pem /etc/strongswan/ipsec.d/certs/</span>
+<span class="c1"># cp -r client.key.pem /etc/strongswan/ipsec.d/private/</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="42-查看证书目录树">4.2 查看证书目录树</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># tree /etc/strongswan/ipsec.d/</span>
+/etc/strongswan/ipsec.d/
+├── aacerts
+├── acerts
+├── cacerts
+│   └── ca.cert.pem
+├── certs
+│   ├── client.cert.pem
+│   └── server.cert.pem
+├── crls
+├── ocspcerts
+├── private
+│   ├── client.key.pem
+│   └── server.key.pem
+└── reqs
+
+<span class="m">8</span> directories, <span class="m">5</span> files
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="五配置strongswan">五、配置StrongSwan</h3>
+<h4 id="51-配置文件及目录">5.1 配置文件及目录</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># rpm -ql strongswan | head -15</span>
+/etc/strongswan
+/etc/strongswan/ipsec.conf           <span class="c1"># ipsec.conf主配置文件</span>    
+/etc/strongswan/ipsec.d
+/etc/strongswan/ipsec.d/aacerts
+/etc/strongswan/ipsec.d/acerts
+/etc/strongswan/ipsec.d/cacerts
+/etc/strongswan/ipsec.d/certs
+/etc/strongswan/ipsec.d/crls
+/etc/strongswan/ipsec.d/ocspcerts
+/etc/strongswan/ipsec.d/private
+/etc/strongswan/ipsec.d/reqs
+/etc/strongswan/ipsec.secrets         <span class="c1"># ipsec.secrets密码认证文件</span>
+/etc/strongswan/strongswan.conf       <span class="c1"># strongswan.conf配置文件</span>
+/etc/strongswan/strongswan.d
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="52-配置ipsecconf">5.2 配置ipsec.conf</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+cat &gt;/etc/strongswan/ipsec.conf <span class="s">&lt;&lt;-EOF
+</span><span class="s">config setup
+</span><span class="s">    # strictcrlpolicy=yes
+</span><span class="s">    uniqueids = never
+</span><span class="s">conn %default
+</span><span class="s">    compress = yes
+</span><span class="s">    esp = aes256-sha256,aes256-sha1,3des-sha1!
+</span><span class="s">    ike = aes256-sha256-ecp384,aes256-sha256-modp2048,aes256-sha1-modp2048,aes128-sha1-modp2048,3des-sha1-modp2048,aes256-sha256-modp1024,aes256-sha1-modp1024,aes128-sha1-modp1024,3des-sha1-modp1024!
+</span><span class="s">    keyexchange = ike
+</span><span class="s">    keyingtries = 1
+</span><span class="s">    leftdns = 119.29.29.29,114.114.114.114
+</span><span class="s">    rightdns = 119.29.29.29,114.114.114.114
+</span><span class="s">conn IKEv2-BASE
+</span><span class="s">    # 服务器端根证书 DN 名称
+</span><span class="s">    leftca = &#34;C=CN, O=VPN, CN=StrongSwan CA&#34;
+</span><span class="s">    # 是否发送服务器证书到客户端
+</span><span class="s">    leftsendcert = always
+</span><span class="s">    # 客户端不发送证书
+</span><span class="s">    rightsendcert = never
+</span><span class="s">conn IKEv2-EAP
+</span><span class="s">    leftca = &#34;C=CN, O=VPN, CN=StrongSwan CA&#34;
+</span><span class="s">    leftcert = server.cert.pem
+</span><span class="s">    leftsendcert = always
+</span><span class="s">    rightsendcert = never
+</span><span class="s">    leftid = 123.235.99.100
+</span><span class="s">    left = %any
+</span><span class="s">    right = %any
+</span><span class="s">    leftauth = pubkey
+</span><span class="s">    rightauth = eap-mschapv2
+</span><span class="s">    leftfirewall = yes
+</span><span class="s">    leftsubnet = 0.0.0.0/0
+</span><span class="s">    rightsourceip = 10.1.0.0/24
+</span><span class="s">    fragmentation = yes
+</span><span class="s">    rekey = no
+</span><span class="s">    eap_identity = %any
+</span><span class="s">    auto = add
+</span><span class="s">
+</span><span class="s">conn android_xauth_psk
+</span><span class="s">       keyexchange=ikev1
+</span><span class="s">       fragmentation=yes
+</span><span class="s">       keyingtries=3
+</span><span class="s">       left=%defaultroute
+</span><span class="s">       leftauth=psk
+</span><span class="s">       right=%any
+</span><span class="s">       rightsourceip = %config
+</span><span class="s">       rightsubnet=0.0.0.0/0
+</span><span class="s">       rightauth=psk
+</span><span class="s">       rightauth2=xauth
+</span><span class="s">       rightsourceip=10.1.0.0/24
+</span><span class="s">       auto=add
+</span><span class="s">
+</span><span class="s">
+</span><span class="s">conn android_hybrid_rsa
+</span><span class="s">  keyexchange = ikev1
+</span><span class="s">  left = %any
+</span><span class="s">  leftid = 123.235.99.100
+</span><span class="s">  leftsendcert = always
+</span><span class="s">  leftcert = server.cert.pem
+</span><span class="s">  leftsubnet = 0.0.0.0/0
+</span><span class="s">  right = %any
+</span><span class="s">  rightauth = xauthpsk
+</span><span class="s">  rightsourceip = 10.1.0.0/24
+</span><span class="s">  auto = add
+</span><span class="s">
+</span><span class="s">conn windows7
+</span><span class="s"> keyexchange = ike
+</span><span class="s"> ike = aes256-sha1-modp1024!
+</span><span class="s"> rekey = no
+</span><span class="s"> left = %defaultroute
+</span><span class="s"> leftauth = pubkey
+</span><span class="s"> leftsubnet = 0.0.0.0/0
+</span><span class="s"> leftcert=server.cert.pem
+</span><span class="s"> right = %any
+</span><span class="s"> rightauth = eap-mschapv2
+</span><span class="s"> rightsourceip = 10.1.0.0/24
+</span><span class="s"> rightsendcert = never
+</span><span class="s"> eap_identity = %any
+</span><span class="s"> auto = add
+</span><span class="s">
+</span><span class="s">conn L2TP-PSK
+</span><span class="s">    keyexchange=ikev1
+</span><span class="s">    authby=secret
+</span><span class="s">    leftprotoport=17/1701 #l2tp端口
+</span><span class="s">    leftfirewall=no
+</span><span class="s">    rightprotoport=17/%any
+</span><span class="s">    type=transport
+</span><span class="s">    auto=add
+</span><span class="s">
+</span><span class="s">conn networkmanager-strongswan
+</span><span class="s">    keyexchange=ikev2
+</span><span class="s">    left=%defaultroute
+</span><span class="s">    leftauth=pubkey
+</span><span class="s">    leftsubnet=0.0.0.0/0
+</span><span class="s">    leftcert=server.cert.pem
+</span><span class="s">    right=%any
+</span><span class="s">    rightauth=pubkey
+</span><span class="s">    rightsourceip=10.1.0.0/24
+</span><span class="s">    rightcert=client.cert.pem
+</span><span class="s">    auto=add
+</span><span class="s">
+</span><span class="s">conn iOS_cert
+</span><span class="s">    keyexchange=ikev1
+</span><span class="s">    fragmentation=yes
+</span><span class="s">    left=%defaultroute
+</span><span class="s">    leftauth=pubkey
+</span><span class="s">    leftsubnet=0.0.0.0/0
+</span><span class="s">    leftcert=server.cert.pem
+</span><span class="s">    right=%any
+</span><span class="s">    rightauth=pubkey
+</span><span class="s">    rightauth2=xauth
+</span><span class="s">    rightsourceip=10.1.0.0/24
+</span><span class="s">    rightcert=client.cert.pem
+</span><span class="s">    auto=add
+</span><span class="s">EOF</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="53-配置ipsecconf注意事项">5.3 配置ipsec.conf注意事项</h4>
+<ul>
+<li>如上配置leftid需要自行按要求手动修改</li>
+</ul>
+<h4 id="54-配置ipsecconf相关项解释">5.4 配置ipsec.conf相关项解释</h4>
+<ul>
+<li>config setup 只能出现一次，而 conn &lt;连接名称&gt; 可以有很多个。conn&lt;连接名称&gt;可以自定义</li>
+<li>uniqueids=never ID不唯一，允许多个客户端使用同一个证书，多设备同时在线</li>
+<li>conn %default 项目共用的配置项</li>
+<li>left=%any  服务器端标识,%any表示任意</li>
+<li>leftsubnet=0.0.0.0/0  服务器端虚拟ip, 0.0.0.0/0表示通配</li>
+<li>leftsourceip=%config4 服务器内部源IP，也称为虚拟IP，并使用％config4显式请求给定地址族的地址</li>
+<li>rightsourceip=10.0.0.0/8 分配给客户端的虚拟 ip 段</li>
+<li>right=%any  客户端端标识，%any表示任意</li>
+<li>auto=add  IPsec启动时会添加加载连接而不启动它</li>
+<li>conn IKE-BASE  自定义的一个ike基础连接</li>
+<li>keyexchange=ike2 使用ike2密钥交换协议来发起连接</li>
+<li>ike=和esp= 采用的连接算法</li>
+<li>leftikeport=4500 用于IKE通信的UDP端口</li>
+<li>ikelifetime=60m 服务器程序连接超时时间</li>
+<li>keyingtries=3  应该进行多少次尝试来协商连接或替换，默认3次</li>
+<li>also=IKE-BASE 继承上面的IKE-BASE的配置</li>
+<li>leftsendcert=always 对等方必须发送证书请求</li>
+<li>dpdaction=clear 定期发送sage（IKEv2），以检查IPsec对等方的活动性</li>
+<li>rekey=no 连接即将到期时是否应该重新协商连接，no阻止守护程序重新协商，但不阻止响应</li>
+<li>leftauth=pubkey 采用公钥连接</li>
+<li>leftcert=server.cert.pem   填写服务器证书</li>
+<li>leftid= 需要和申请CA签发证书中的域名一致</li>
+<li>rightauth=eap-mschapv2 <em>身份验证方法</em></li>
+<li>rightsendcert=never 接受的值是<strong>never</strong>或<strong>no</strong>，<strong>always</strong>或<strong>yes</strong>，以及<strong>ifasked</strong>，后者表示
+对等方必须发送证书请求（CR）有效负载才能获得证书作为回报。</li>
+<li>eap_identity=*％identity* 定义客户端用来回复EAP身份请求的身份，特殊值*％identity*使用EAP Identity方法
+来向客户端请求EAP身份</li>
+<li>fragmentation=yes 使用IKE分段，始终会处理由对等方发送的碎片消息</li>
+<li>leftfirewall=yes 使用iptables对来自左子网的流量进行转发防火墙</li>
+</ul>
+<h4 id="55-配置ipsecconf参数官网参考">5.5 配置ipsec.conf参数官网参考</h4>
+<p><a href="https://wiki.strongswan.org/projects/strongswan/wiki/IpsecConf">https://wiki.strongswan.org/projects/strongswan/wiki/IpsecConf</a></p>
+<p><a href="https://wiki.strongswan.org/projects/strongswan/wiki/ConnSection">https://wiki.strongswan.org/projects/strongswan/wiki/ConnSection</a></p>
+<h4 id="56-配置ipsecsecrets文件">5.6 配置ipsec.secrets文件</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+cat &gt;/etc/strongswan/ipsec.secrets <span class="s">&lt;&lt;-EOF
+</span><span class="s"># ipsec.secrets - strongSwan IPsec secrets file
+</span><span class="s">: RSA server.key.pem
+</span><span class="s">: PSK &#34;test123&#34;
+</span><span class="s">%any %any : PSK &#34;test123&#34;
+</span><span class="s">test123 %any : EAP &#34;test123&#34;
+</span><span class="s">test123 %any : XAUTH &#34;test123&#34;
+</span><span class="s">EOF</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="57-配置ipsecsecrets格式">5.7 配置ipsec.secrets格式</h4>
+<ul>
+<li>: RSA server.key.pem  申请的证书的私钥</li>
+<li>zhangsan %any  : EAP &ldquo;x3.dEhgN&rdquo;  格式为 [账号 %any : EAP &ldquo;密码&rdquo;]，每行一个账号</li>
+</ul>
+<h4 id="58-配置strongswanconf文件">5.8 配置strongswan.conf文件</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+cat &gt;/etc/strongswan/strongswan.conf <span class="s">&lt;&lt;-EOF
+</span><span class="s"># strongswan.conf - strongSwan configuration file
+</span><span class="s">#
+</span><span class="s"># Refer to the strongswan.conf(5) manpage for details
+</span><span class="s">#
+</span><span class="s"># Configuration changes should be made in the included files
+</span><span class="s">
+</span><span class="s">charon {
+</span><span class="s">	load_modular = yes
+</span><span class="s">	duplicheck{ #这里
+</span><span class="s">        enable = no
+</span><span class="s">        }
+</span><span class="s">	compress = yes
+</span><span class="s">	dns1 = 119.29.29.29
+</span><span class="s">	dns2 = 114.114.114.114
+</span><span class="s">	bdns1 = 119.29.29.29
+</span><span class="s">	bdns2 = 114.114.114.114
+</span><span class="s">	#dns1 = 183.60.83.19
+</span><span class="s">	#dns2 = 183.60.82.98
+</span><span class="s">#	bdns1 = 183.60.83.19
+</span><span class="s">#	bdns2 = 183.60.82.98
+</span><span class="s">	plugins {
+</span><span class="s">		include strongswan.d/charon/*.conf
+</span><span class="s">	}
+</span><span class="s">	filelog {
+</span><span class="s">               charon {
+</span><span class="s">                   path = /var/log/charon.log
+</span><span class="s">                   time_format = %b %e %T
+</span><span class="s">                   default = 2
+</span><span class="s">                   append = yes
+</span><span class="s">                   flush_line = yes
+</span><span class="s">               }
+</span><span class="s">         }
+</span><span class="s">}
+</span><span class="s">
+</span><span class="s">include strongswan.d/*.conf
+</span><span class="s">EOF</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="59-配置stronswanconf相关项解释">5.9 配置stronswan.conf相关项解释</h4>
+<ul>
+<li>
+<p>filelog 配置日志模块</p>
+</li>
+<li>
+<p>duplicheck_enable = no：是为了同时连接多个设备，所以要把冗余检查关闭</p>
+</li>
+<li>
+<p>path = /var/log/charon.log</p>
+</li>
+<li>
+<p>default = 2：定义的是日志的级别，默认日志级别为：-1,0,1,2,3,4，-1是完全没有日志</p>
+</li>
+<li>
+<p>0只告诉你建立连接，连接关闭</p>
+</li>
+<li>
+<p>1只输出错误提示</p>
+</li>
+<li>
+<p>2会输出错误，警告和调试信息</p>
+</li>
+<li>
+<p>3会把连接传输的数据也打印</p>
+</li>
+<li>
+<p>4则会把密钥内容这些敏感数据也打印</p>
+</li>
+<li>
+<p>一般情况下，1或2都可以</p>
+</li>
+<li>
+<p>append = no：重启strogswan后，追加 写日志，不新建一个日志（上次的会删除）</p>
+</li>
+<li>
+<p>no flush_line = yes 每产生一行日志，就写入到磁盘一次，防止突然断电，磁盘缓存数据丢失</p>
+</li>
+</ul>
+<h3 id="六启动检证strongswan">六、启动检证strongswan</h3>
+<h4 id="61-启动和设置开机自启">6.1 启动和设置开机自启</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># systemctl enable strongswan</span>
+<span class="c1"># systemctl start strongswan</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="62-检查进程和开机启动">6.2 检查进程和开机启动</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># systemctl status strongswan</span>
+<span class="c1"># systemctl list-unit-files | grep strongswan</span>
+<span class="c1"># netstat -ulnp | grep charon</span>
+udp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:4500            0.0.0.0:*                           14201/charon        
+udp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:500             0.0.0.0:*                           14201/charon        
+udp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:68              0.0.0.0:*                           14201/charon        
+udp6       <span class="m">0</span>      <span class="m">0</span> :::4500                 :::*                                14201/charon        
+udp6       <span class="m">0</span>      <span class="m">0</span> :::500                  :::*                                14201/charon  
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="七防火墙配置">七、防火墙配置</h3>
+<h4 id="71-centos7firewalld配置">7.1 CentOS7firewalld配置</h4>
+<h5 id="711-允许esp加密协议通过防火墙">7.1.1 允许ESP加密协议通过防火墙</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># firewall-cmd --zone=public --permanent --add-rich-rule=&#39;rule protocol value=&#34;esp&#34; accept&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="712-开放-相关端口">7.1.2 开放 相关端口</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># firewall-cmd --zone=public --permanent --add-port=500/udp</span>
+<span class="c1"># firewall-cmd --zone=public --permanent --add-port=4500/udp</span>
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="713-允许ip伪装">7.1.3 允许IP伪装</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># firewall-cmd --zone=public --permanent --add-masquerade</span>
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="714-重载防火墙验证">7.1.4 重载防火墙验证</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># firewall-cmd --reload</span>
+<span class="c1"># firewall-cmd --list-all</span>
+</code></pre></td></tr></table>
+</div>
+</div><h4 id="72-centos7iptables配置">7.2 CentOS7iptables配置</h4>
+<h5 id="721-允许-ah-和-esp-身份验证协议和加密协议通过防火墙">7.2.1 允许 ‘AH’ 和 ‘ESP’ 身份验证协议和加密协议通过防火墙</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+iptables -I INPUT -p esp -j ACCEPT
+iptables -I INPUT -p ah -j ACCEPT
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="722-开放-ipsec-和相关端口">7.2.2 开放 ipsec 和相关端口</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+iptables -I INPUT -p udp -m udp --dport <span class="m">68</span> -j ACCEPT
+iptables -I INPUT -p udp -m udp --dport <span class="m">500</span> -j ACCEPT
+iptables -I INPUT -p tcp -m tcp --dport <span class="m">500</span> -j ACCEPT
+iptables -I INPUT -p udp -m udp --dport <span class="m">4500</span> -j ACCEPT
+iptables -I INPUT -p udp -m udp --dport <span class="m">1701</span> -j ACCEPT
+iptables -I INPUT -p tcp -m tcp --dport <span class="m">1723</span> -j ACCEPT
+iptables -I FORWARD -s 10.1.0.0/24 -j ACCEPT
+iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="723-允许ip伪装和android-mtu值">7.2.3 允许IP伪装和android mtu值</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+iptables -t nat -A POSTROUTING -s 10.1.0.0/24 -j MASQUERADE
+<span class="c1">#注意eth0网卡名称，适当修改</span>
+iptables -t mangle -A FORWARD -o eth0 -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss <span class="m">1360</span>
+</code></pre></td></tr></table>
+</div>
+</div><h5 id="724-保存并重启查看防火墙">7.2.4 保存并重启查看防火墙</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"># 
+service iptables save 
+systemctl restart iptables
+iptables -nL
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="八开启内核转发">八、开启内核转发</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash"><span class="c1"># grep &#39;net.ipv4.ip_forward=1&#39; /etc/sysctl.conf || echo &#34;net.ipv4.ip_forward=1&#34; &gt;&gt; /etc/sysctl.conf &amp;&amp; sysctl -p</span> 
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="九vpn-pptpl2tpikev2openvpnssh协议的区别">九、VPN PPTP/L2TP/IKEv2/OpenVPN/SSH协议的区别</h3>
+<ul>
+<li>OpenVPN：OpenVPN允许参与建立VPN的单点使用预设的私钥，第三方证书，或者用户名/密码来进行身份验证。OpenVPN能在Linux、xBSD、Mac OS X与Windows2000/XP上运行。它不与IPsec及其他VPN软件包兼容。
+支持平台：Windows、Mac OS、iPhone、Android。
+其特点是：安全系数高。缺点：易用性差、兼容性差。</li>
+<li>PPTP：点对点隧道协议（PPTP）是一种支持多协议虚拟专用网络的网络技术。通过该协议，远程用户能够通过Windows NT工作站、XP、2000 、2003、Win7操作系统以及其它装有点对点协议的系统安全访问公司网络。默认端口号：1723
+其特点是：连接速度快。缺点：已河蟹，使用不稳定。
+支持平台：Windows、Mac OS、iPhone、Android、Linux。</li>
+<li>L2TP：L2TP和PPTP差不多，PPTP要求网络为IP网络，L2TP要求面向数据包的点对点连接；PPTP使用单一隧道，L2TP使用多隧道；L2TP提供包头压缩、隧道验证，而PPTP不支持。
+其特点是：连接速度快。缺点：已河蟹，使用不稳定（但稳定性比PPTP稍高）。
+支持平台：Windows、Mac OS、iPhone、Android、Linux。</li>
+<li>SSH和Socks：这2种代理协议其实差不多，这里就拿到一块儿说了。SSH 为建立在应用层和传输层基础上的安全协议。SSH目前较可靠，专为远程登录会话和其他网络服务提供安全性的协议。利用 SSH 协议可以有效防止远程管理过程中的信息泄露。
+其特点是：速度快，使用稳定、加密性高。缺点：1、无法全局代理（除非借助第三方软件）；2、使用稍复杂。</li>
+<li>支持平台：Windows、Mac OS、Android、Linux。
+IPSec/IKEv2：“Internet 协议安全性 (IPSec)”是一种开放标准的框架结构，通过使用加密的安全服务以确保在 Internet 协议 (IP) 网络上进行保密而安全的通讯。
+其特点是：连接速度快、稳定性高。缺点：使用稍复杂。
+支持平台：Windows 7以上、Mac OS、iPhone、Android 4.0以上。</li>
+</ul>
+<h3 id="十参考网址">十、参考网址</h3>
+<p><a href="http://blog.sina.com.cn/s/blog_a72b50c80102wf0j.html">http://blog.sina.com.cn/s/blog_a72b50c80102wf0j.html</a></p>
+<p><a href="https://linsir.org/post/how_to_install_IPSec_IKEV2_base_on_strongswan_with_CentOS7/">https://linsir.org/post/how_to_install_IPSec_IKEV2_base_on_strongswan_with_CentOS7/</a></p>
+<p><a href="https://zh.opensuse.org/index.php?title=SDB:Setup_Ipsec_VPN_with_Strongswan&amp;variant=zh">https://zh.opensuse.org/index.php?title=SDB:Setup_Ipsec_VPN_with_Strongswan&amp;variant=zh</a></p>
+<h3 id="十一查看strongswan状态">十一、查看strongswan状态：</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash">strongswan statusall
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="十二android手机证书配置">十二、Android手机证书配置：</h3>
+<ul>
+<li>复制以下证书文件到手机上，点击打开进行安装:</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash">cp server.cert.pem server.cert.crt
+sz client.cert.p12 server.cert.crt
+</code></pre></td></tr></table>
+</div>
+</div><p>Android可用2种连接方式：</p>
+<p>1、IPSec Hybrid RSA（ca证书+服务器证书+用户名+密码）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cmd" data-lang="cmd">设置 -<span class="p">&gt;</span> VPN -<span class="p">&gt;</span> 添加vpn
+名称：ikev1
+类型：IPSec Hybrid RSA
+服务器地址：111.78.143.23
+IPSEC CA证书：选择client证书
+IPSEC服务器证书：选择server证书
+账户：user1
+密码：12345678
+</code></pre></td></tr></table>
+</div>
+</div><p>2、IPSec Xauth PSK(共享密钥+用户名+密码)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cmd" data-lang="cmd">设置 -<span class="p">&gt;</span> VPN -<span class="p">&gt;</span> 添加vpn
+名称：ikev1
+类型：IPSec Xauth PSK
+服务器地址：111.78.143.23
+IPSec 标识符：不需要填写
+预共享密钥：vpntest
+账户：user1
+密码：12345678
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="十三win7win10-证书配置">十三、win7/win10 证书配置：</h3>
+<ul>
+<li>
+<p><strong>方法1</strong>: 通过<strong>证书</strong>+<strong>密码</strong>认证连接vpn</p>
+<p>1、下载证书文件：</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash">sz ca.cert.pem
+</code></pre></td></tr></table>
+</div>
+</div><p>​      2、windows导入证书到受信任的根证书颁发机构(复制下面脚本代码，新建import.bat)：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cmd" data-lang="cmd"><span class="p">@</span><span class="k">echo</span> off
+<span class="p">@</span><span class="k">setlocal</span> enableextensions
+<span class="p">@</span><span class="k">set</span> <span class="nv">current_dir</span><span class="p">=</span><span class="s2">&#34;</span><span class="nv">%~dp0</span><span class="s2">&#34;</span>
+<span class="p">@</span><span class="k">cd</span> /d <span class="s2">&#34;</span><span class="nv">%current_dir%</span><span class="s2">&#34;</span>
+<span class="p">@</span><span class="k">echo</span> <span class="nv">%current_dir%</span>
+<span class="p">@</span>certutil -addstore root ca.cert.pem
+<span class="k">if</span> <span class="nv">%ERRORLEVEL%</span> <span class="ow">EQU</span> 0 <span class="p">@</span><span class="k">echo</span>  import ok
+<span class="k">pause</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><strong>或者通过第三方工具导入：</strong></p>
+<p>第三方证书管理工具CertMg下载地址：</p>
+<p><a href="http://down1.100down.com/pc/CertMgr.rar">http://down1.100down.com/pc/CertMgr.rar</a></p>
+<p>新建import1.bat:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cmd" data-lang="cmd"><span class="k">cd</span> /d <span class="nv">%~dp0</span>
+CertMgr.exe /add ca.cert.crt -s -r localMachine trustedpublisher -all
+CertMgr.exe /add ca.cert.crt -s -r localMachine AuthRoot -all
+</code></pre></td></tr></table>
+</div>
+</div><p>​     <code>注意：运行脚本时，证书文件要和脚本在同一目录下。</code></p>
+<p>​      3、通过powershell创建ikev2 vpn连接(create-vpn.ps1)：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="nv">$VpnServerAddress</span> <span class="p">=</span> <span class="s2">&#34;123.235.99.100&#34;</span>
+<span class="nv">$VpnName</span> <span class="p">=</span> <span class="s2">&#34;IKEv2-vpn&#34;</span>
+
+<span class="nv">$addVpnParams</span> <span class="p">=</span> <span class="p">@{</span>
+    <span class="n">Name</span> <span class="p">=</span> <span class="nv">$VpnName</span>
+    <span class="n">ServerAddress</span> <span class="p">=</span> <span class="nv">$VpnServerAddress</span>
+    <span class="n">TunnelType</span> <span class="p">=</span> <span class="s2">&#34;IKEv2&#34;</span>
+    <span class="n">AuthenticationMethod</span> <span class="p">=</span> <span class="s2">&#34;EAP&#34;</span>
+    <span class="n">EncryptionLevel</span> <span class="p">=</span> <span class="s2">&#34;Required&#34;</span>
+<span class="p">}</span>
+<span class="nb">Add-VpnConnection</span> <span class="nv">@addVpnParams</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>方法2</strong> : 通过<strong>个人证书</strong>认证连接vpn</li>
+</ul>
+<p>下载证书文件：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-Bash" data-lang="Bash">sz ca.cert.pem client.cert.p12
+</code></pre></td></tr></table>
+</div>
+</div><p>windows导入证书到受信任的根证书颁发机构(复制下面脚本代码，新建create-vpn.ps1)：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="nv">$VpnServerAddress</span> <span class="p">=</span> <span class="s2">&#34;123.235.99.100&#34;</span>
+<span class="nv">$UserP12Path</span> <span class="p">=</span> <span class="s2">&#34;client.cert.p12&#34;</span>
+<span class="nv">$CaCertPath</span> <span class="p">=</span> <span class="s2">&#34;client.cert.pem&#34;</span>
+<span class="nv">$VpnName</span> <span class="p">=</span> <span class="s2">&#34;IKEv2-VPN-own&#34;</span>
+<span class="nv">$p12Pass</span> <span class="p">=</span> <span class="nb">Read-Host</span> <span class="n">-AsSecureString</span> <span class="n">-Prompt</span> <span class="s2">&#34;P12 Password&#34;</span>
+<span class="nb">Import-PfxCertificate</span> <span class="n">-FilePath</span> <span class="nv">$UserP12Path</span> <span class="n">-CertStoreLocation</span> <span class="n">Cert</span><span class="err">:</span><span class="p">\</span><span class="n">LocalMachine</span><span class="p">\</span><span class="n">My</span> <span class="n">-Password</span> <span class="nv">$p12Pass</span>
+<span class="nb">Import-Certificate</span> <span class="n">-FilePath</span> <span class="nv">$CaCertPath</span> <span class="n">-CertStoreLocation</span> <span class="n">Cert</span><span class="err">:</span><span class="p">\</span><span class="n">LocalMachine</span><span class="p">\</span><span class="n">Root</span>
+
+<span class="nb">Add-VpnConnection</span> <span class="n">-Name</span> <span class="nv">$VpnName</span> <span class="n">-ServerAddress</span> <span class="nv">$VpnServerAddress</span> <span class="n">-TunnelType</span> <span class="n">IKEv2</span> <span class="n">-AuthenticationMethod</span> <span class="n">MachineCertificate</span>
+<span class="nb">Set-VpnConnection</span> <span class="n">-ConnectionName</span> <span class="nv">$VpnName</span> <span class="n">-splittunneling</span> <span class="nv">$false</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>方法3</strong> : 通过psk<strong>共享密钥+用户名+密码</strong>连接vpn(create-l2tp.ps1)</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="nb">Add-VpnConnection</span> <span class="n">-Name</span> <span class="s1">&#39;l2tp-vpn&#39;</span> <span class="p">`</span>
+	<span class="n">-ServerAddress</span> <span class="s1">&#39;123.235.99.100&#39;</span> <span class="p">`</span>
+	<span class="n">-L2tpPsk</span> <span class="s1">&#39;test123&#39;</span> <span class="p">`</span>
+	<span class="n">-TunnelType</span> <span class="n">L2tp</span> <span class="p">`</span>
+	<span class="n">-EncryptionLevel</span> <span class="n">Required</span> <span class="p">`</span>
+	<span class="n">-AuthenticationMethod</span> <span class="n">Chap</span><span class="p">,</span><span class="n">MSChapv2</span> <span class="p">`</span>
+	<span class="n">-Force</span> <span class="p">`</span>
+	<span class="n">-RememberCredential</span> <span class="p">`</span>
+	<span class="n">-PassThru</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="n">如果连接l2tp出现</span><span class="err">：</span><span class="n">Windows错误809</span><span class="err">，</span><span class="n">请以管理员身份打开cmd命令行窗口中输入以下2条命令</span><span class="err">，</span><span class="n">并重启电脑</span><span class="err">：</span>
+
+<span class="n">REG</span> <span class="n">ADD</span> <span class="n">HKLM</span><span class="p">\</span><span class="n">SYSTEM</span><span class="p">\</span><span class="n">CurrentControlSet</span><span class="p">\</span><span class="n">Services</span><span class="p">\</span><span class="n">PolicyAgent</span> <span class="p">/</span><span class="n">v</span> <span class="n">AssumeUDPEncapsulationContextOnSendRule</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_DWORD</span> <span class="p">/</span><span class="n">d</span> <span class="n">0x2</span> <span class="p">/</span><span class="n">f</span>
+
+<span class="n">REG</span> <span class="n">ADD</span> <span class="n">HKLM</span><span class="p">\</span><span class="n">SYSTEM</span><span class="p">\</span><span class="n">CurrentControlSet</span><span class="p">\</span><span class="n">Services</span><span class="p">\</span><span class="n">RasMan</span><span class="p">\</span><span class="n">Parameters</span> <span class="p">/</span><span class="n">v</span> <span class="n">ProhibitIpSec</span> <span class="p">/</span><span class="n">t</span> <span class="n">REG_DWORD</span> <span class="p">/</span><span class="n">d</span> <span class="n">0x0</span> <span class="p">/</span><span class="n">f</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="十四苹果ios-配置vpn连接">十四、苹果ios 配置vpn连接：</h3>
+<ul>
+<li>
+<p>系统iOS 13通过IPsec连接vpn（<strong>共享密钥+用户名+密码</strong>）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-powershell" data-lang="powershell"><span class="n">设置</span> <span class="p">-&gt;</span> <span class="n">VPN</span> <span class="p">-&gt;</span> <span class="n">添加vpn配置</span>
+<span class="n">类型</span><span class="err">：</span><span class="n">IPSec</span>
+<span class="n">描述</span><span class="err">：</span><span class="n">ipsec</span>
+<span class="n">服务器</span><span class="err">：</span><span class="n">111</span><span class="p">.</span><span class="n">78</span><span class="p">.</span><span class="n">143</span><span class="p">.</span><span class="n">23</span>
+<span class="n">账户</span><span class="err">：</span><span class="n">user1</span>
+<span class="n">密码</span><span class="err">：</span><span class="n">12345678</span>
+<span class="n">使用证书</span><span class="err">：</span> <span class="n">OFF</span><span class="err">（</span><span class="n">关闭</span><span class="err">）</span>
+<span class="n">群组名</span><span class="err">：</span><span class="n">不需要填写</span>
+<span class="n">密钥</span><span class="err">：</span><span class="n">abcd1234</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>系统iOS 13通过ikev2方式连接vpn（<strong>共享密钥+用户名+密码</strong>）</p>
+<p>通过<strong>邮箱发送</strong>或者<strong>系统自带Safari浏览器</strong>访问下载（<strong>ca.cert.pem和client.cert.p12</strong>）</p>
+<p>比如：</p>
+<p>http://100.25.3.11/ca.cert.pem</p>
+<p>http://100.25.3.11/client.cert.p12</p>
+<p>用Safari浏览器访问上面2个地址，</p>
+<p>会提示“<strong>此网站正尝试下载一个配置描述文件。您要允许吗？</strong>”，点击“<strong>允许</strong>”，然后进入系统设置，在<strong>已下载描述文件</strong>中查看，并进行安装。</p>
+<p>以上2个网址依次访问，在安装client.cert.p12这个证书时，会要求输入证书“身份证书”的密码，输入密码之后，点击安装。</p>
+<p>安装完成就可以进行下面配置：</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-cmd" data-lang="cmd"> 设置 -<span class="p">&gt;</span> VPN -<span class="p">&gt;</span> 添加vpn配置
+ 类型：IKEv2
+ 描述：ikev2
+ 服务器：111.78.143.23
+ 远程ID：111.78.143.23
+ 本地ID：不需要填写
+ 用户鉴定：用户名
+ 账户：user1
+ 密码：12345678
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">Author</span>
+    <span class="item-content">Wikipedia</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">LastMod</span>
+    <span class="item-content">
+        2020-05-21
+        
+    </span>
+  </p>
+  
+  <p class="copyright-item">
+    <span class="item-title">License</span>
+    <span class="item-content"><a rel="license noopener" href="https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License" target="_blank">Creative Commons Attribution-ShareAlike License</a></span>
+  </p>
+</div>
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">Reward</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/img/reward/wechat.png">
+        <span>wechat</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="../../wechat-qr-code.png">
+        <span>alipay</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/preview/">preview</a>
+          <a href="/tags/linux/">linux</a>
+          <a href="/tags/tag-1/">tag-1</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/even-preview/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Theme preview</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/hidden-post/">
+            <span class="next-text nav-default">This is a hidden post.</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> site pv: <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> site uv: <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2020
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">olOwOlo</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.d7b7ada643c9c1a983026e177f141f7363b4640d619caf01d8831a6718cd44ea.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
